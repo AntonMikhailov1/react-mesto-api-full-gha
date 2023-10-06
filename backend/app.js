@@ -17,6 +17,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 
 const { PORT = 3000 } = process.env;
+const { DB_ADDRESS = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const app = express();
 
@@ -33,7 +34,7 @@ const limiter = rateLimit({
 app.use(express.json());
 app.use(limiter);
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+mongoose.connect(DB_ADDRESS);
 
 app.get('/', (req, res) => {
   res.status(httpStatus.OK).send({ message: 'Hello World!' });
