@@ -1,0 +1,35 @@
+.auth__submit-btn {
+  box-sizing: border-box;
+  padding: 0;
+  background-color: #fff;
+  border: none;
+  margin-top: 173px;
+  margin-bottom: 20px;
+  min-width: 260px;
+  min-height: 46px;
+  font-size: 16px;
+  line-height: 1.21;
+  text-align: center;
+}
+
+@media screen and (min-width: 619px) {
+  .auth__submit-btn {
+    box-sizing: border-box;
+    padding: 0;
+    background-color: #fff;
+    border: none;
+    margin-top: 216px;
+    margin-bottom: 15px;
+    min-width: 358px;
+    min-height: 50px;
+    font-size: 18px;
+    line-height: 1.21;
+    text-align: center;
+  }
+}
+
+.auth__submit-btn:hover {
+  opacity: 0.85;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}

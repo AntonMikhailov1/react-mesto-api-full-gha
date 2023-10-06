@@ -1,0 +1,21 @@
+.popup__field-error {
+    display: block;
+    color: #FF0000;
+    margin: 0;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.21;
+    height: calc(20px - 5px);
+}
+
+.popup__field-error:last-of-type {
+    height: calc(44px - 10px);
+}
+
+@media screen and (min-width: 619px) {
+    .popup__field:last-of-type {
+        height: calc(48px - 10px);
+    }
+}

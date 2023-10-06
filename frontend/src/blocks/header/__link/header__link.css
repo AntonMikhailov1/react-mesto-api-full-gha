@@ -1,0 +1,23 @@
+.header__link {
+  display: inline;
+  box-sizing: border-box;
+  height: fit-content;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.21;
+  letter-spacing: 0em;
+  color: #fff;
+  text-decoration: none;
+}
+
+@media screen and (min-width: 918px) {
+  .header__link {
+    font-size: 18px;
+  }
+}
+.header__link:hover {
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.5s ease;
+}

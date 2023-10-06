@@ -1,0 +1,10 @@
+.element__group {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 242px;
+    height: auto;
+}

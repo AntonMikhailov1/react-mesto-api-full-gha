@@ -1,0 +1,14 @@
+.element {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    width: 282px;
+    height: 361.5px;
+    overflow: hidden;
+}

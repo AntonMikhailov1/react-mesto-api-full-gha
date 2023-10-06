@@ -1,0 +1,12 @@
+.element__image {
+    display: block;
+    margin: 0;
+    margin-bottom: 25px;
+    padding: 0;
+    box-sizing: border-box;
+    width: 282px;
+    height: 282px;
+    object-fit: cover;
+    object-position: center;
+    cursor: pointer;
+}

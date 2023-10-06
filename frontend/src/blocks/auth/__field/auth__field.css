@@ -1,0 +1,18 @@
+.auth__field {
+  box-sizing: border-box;
+  margin: 0 auto 30px;
+  padding: 0;
+  padding-bottom: 13px;
+  min-width: 260px;
+  color: #cccccc;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+}
+
+@media screen and (min-width: 619px) {
+  .auth__field {
+    min-width: 358px;
+  }
+}
