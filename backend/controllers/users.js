@@ -65,7 +65,11 @@ const createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then((user) => res.status(httpStatus.CREATED).send(user))
+        .then((user) => {
+          const data = user.toObject();
+          delete data.password;
+          res.status(httpStatus.CREATED).send(user);
+        })
         // eslint-disable-next-line consistent-return
         .catch((err) => {
           if (err.code === 11000) {
