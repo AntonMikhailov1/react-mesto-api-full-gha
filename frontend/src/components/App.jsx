@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -6,8 +6,7 @@ import CurrentUserContext from "../contexts/CurrentUserContext.jsx";
 
 import "../index.css";
 
-import api from "../utils/api";
-import * as auth from "../utils/auth";
+import * as api from "../utils/api";
 
 import Header from "./Header";
 import Main from "./Main";
@@ -44,146 +43,177 @@ export default function App() {
       Promise.all([api.getProfileInfo(), api.getInitialCards()])
         .then(([userData, cardData]) => {
           setCurrentUser(userData);
-          setCards(cardData);
+          setCards(cardData.reverse());
         })
         .catch((err) => console.error(err));
     }
   }, [loggedIn]);
 
-  // Registration
-  function handleUserSignUp(signUpData) {
-    auth
-      .signUpUser(signUpData)
-      .then((res) => {
-        if (res) {
+  const handleUserSignUp = useCallback(
+    async (userData) => {
+      try {
+        const data = await api.signUpUser(userData);
+        if (data) {
           setIsSignUpSuccess(true);
-          navigate("/sing-in");
+          navigate("/signin", { replace: true });
         }
-      })
-      .catch((err) => {
-        setIsSignUpSuccess(false);
-        console.log(err);
-      })
-      .finally(() => setIsInfoTooltipOpen(true));
-  }
+      } catch (err) {
+          setIsSignUpSuccess(false);
+          console.log(err);
+      } finally {
+        setIsInfoTooltipOpen(true);
+      }
+    },
+    [navigate]
+  );
 
-  // Authentication
-  function handleUserSignIn(signInData) {
-    auth
-      .signInUser(signInData)
-      .then((res) => {
-        if (res) {
-          setUserEmail(signInData.email);
+  const handleUserSignIn = useCallback(
+    async (userData) => {
+      try {
+        const data = await api.signInUser(userData);
+        if (data) {
           setLoggedIn(true);
-          navigate("/");
+          setUserEmail(userData.email);
+          navigate("/", { replace: true });
         }
-      })
-      .catch((err) => {
+      } catch (err) {
         setIsSignUpSuccess(false);
         setIsInfoTooltipOpen(true);
         console.log(err);
-      });
-  }
+      }
+    },
+    [navigate]
+  );
 
-  function handleUserSingOut() {
-    localStorage.removeItem("token");
-    setUserEmail("");
-    setLoggedIn(false);
-    navigate("/sign-in");
-  }
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      auth
-        .checkToken(token)
-        .then((res) => {
-          console.log(res);
-          if (res) {
-            setLoggedIn(true);
-            setUserEmail(res.data.email);
-            navigate("/");
-          }
-        })
-        .catch((err) => console.log(err));
+  const handleUserSingOut = useCallback(async () => {
+    try {
+      const data = await api.signOutUser();
+      if (data) {
+        setLoggedIn(false);
+        setUserEmail("");
+        navigate("/signin", { replace: true });
+      }
+    } catch (err) {
+      console.error(err);
     }
   }, [navigate]);
 
-  function handleEditProfileClick() {
-    setIsEditProfilePopupOpen(true);
-  }
+  const handleCardDelete = useCallback(
+    async (card) => {
+      try {
+        const data = await api.deleteCard(card._id);
+        if (data) {
+          setCards((state) => state.filter((item) => item._id !== card._id));
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }, []
+  );
 
-  function handleEditAvatarClick() {
-    seIsEditAvatarPopupOpen(true);
-  }
+const handleCardLike = useCallback(
+    async (card) => {
+      const isLiked = card.likes.some((item) => item === currentUser._id);
+      try {
+        const data = await api.changeLikeCardStatus(card._id, !isLiked);
+        if (data) {
+          setCards((state) =>
+            state.map((item) => (item._id === card._id ? data : item))
+          );
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [currentUser._id]
+  );
 
-  function handleAddPlaceClick() {
-    setIsAddPlacePopupOpen(true);
-  }
-
-  function handleCardClick(card) {
-    setSelectedCard(card);
-    setIsImagePopupOpen(true);
-  }
-
-  function handleCardDelete(card) {
-    api
-      .deleteCard(card._id)
-      .then(() => {
-        setCards((state) => state.filter((c) => c._id !== card._id));
-      })
-      .catch((err) => console.error(err));
-  }
-
-  function handleCardLike(card) {
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
-    api
-      .changeLikeCardStatus(card._id, !isLiked)
-      .then((newCard) => {
-        setCards((state) =>
-          state.map((c) => (c._id === card._id ? newCard : c))
-        );
-      })
-      .catch((err) => console.error(err));
-  }
-
-  function closeAllPopups() {
+  const closeAllPopups = useCallback(() => {
     setIsEditProfilePopupOpen(false);
     seIsEditAvatarPopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsImagePopupOpen(false);
     setIsInfoTooltipOpen(false);
-  }
+  }, []);
 
-  function handleUpdateUser(userData) {
-    api
-      .setProfileInfo(userData)
-      .then((currentUserState) => {
-        setCurrentUser(currentUserState);
-        closeAllPopups();
-      })
-      .catch((err) => console.error(err));
-  }
+  const handleUpdateUser = useCallback(
+    async (userData) => {
+      try {
+        const data = await api.setProfileInfo(userData);
+        if (data) {
+          setCurrentUser(data);
+          closeAllPopups();
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [closeAllPopups]
+  );
 
-  function handleUpdateAvatar(userData) {
-    api
-      .setAvatar(userData)
-      .then((currentUserState) => {
-        setCurrentUser(currentUserState);
-        closeAllPopups();
-      })
-      .catch((err) => console.error(err));
-  }
+  const handleUpdateAvatar = useCallback(
+    async (avatarData) => {
+      try {
+        const data = await api.setAvatar(avatarData);
+        if (data) {
+          setCurrentUser(data);
+          closeAllPopups();
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [closeAllPopups]
+  );
 
-  function handleAddPlace(cardData) {
-    api
-      .addCard(cardData)
-      .then((newCard) => {
-        setCards([newCard, ...cards]);
-        closeAllPopups();
-      })
-      .catch((err) => console.error(err));
-  }
+  const handleAddPlace = useCallback(
+    async (cardData) => {
+      try {
+        const data = await api.addCard(cardData);
+        if (data) {
+          setCards([data, ...cards]);
+          closeAllPopups();
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [cards, closeAllPopups]
+  );
+
+  const handleEditProfileClick = useCallback(() => {
+    setIsEditProfilePopupOpen(true);
+  }, []);
+
+  const handleEditAvatarClick= useCallback(() => {
+    seIsEditAvatarPopupOpen(true);
+  }, []);
+
+  const handleAddPlaceClick= useCallback(() => {
+    setIsAddPlacePopupOpen(true);
+  }, []);
+
+  const handleCardClick = useCallback((card) => {
+    setSelectedCard(card);
+    setIsImagePopupOpen(true);
+  }, []);
+
+  const userLoginCheck = useCallback(async () => {
+    try {
+      const userData = await api.getContent();
+      if (userData.email) {
+        setUserEmail(userData.email);
+        setLoggedIn(true);
+        navigate("/", { replace: true });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    userLoginCheck();
+  }, [userLoginCheck]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -211,17 +241,17 @@ export default function App() {
 
           <Route
             exact
-            path="/sign-up"
+            path="/signup"
             element={<Register onSignUp={handleUserSignUp} />}
           />
 
           <Route
             exact
-            path="/sign-in"
+            path="/signin"
             element={<Login onSignIn={handleUserSignIn} />}
           />
 
-          <Route path="*" element={<Navigate to="/sign-in" />} />
+          <Route path="*" element={<Navigate to="/signin" />} />
         </Routes>
 
         <Footer />

@@ -10,18 +10,18 @@ export default function Header({userEmail, onSignOut}) {
 
       <Routes>
         <Route
-          exact path="/sign-in"
+          exact path="/signin"
           element={
-            <Link to="/sign-up" className="header__link">
+            <Link to="/signup" className="header__link">
               Регистрация
             </Link>
           }
         />
 
         <Route
-          exact path="/sign-up"
+          exact path="/signup"
           element={
-            <Link to="/sign-in" className="header__link">
+            <Link to="/signin" className="header__link">
               Войти
             </Link>
           }

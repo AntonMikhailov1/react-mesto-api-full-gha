@@ -1,96 +1,59 @@
-class Api {
-  #url;
-  #headers;
-  #token;
+const baseUrl = "https://api.antonmikhailov.nomoredomainsrocks.ru";
 
-  constructor(options) {
-    this.#url = options.baseUrl;
-    this.#headers = options.headers;
-    this.#token = options.headers.authorization;
+export function request(url, method, body) {
+  const headers = { "Content-Type": "application/json" };
+  const config = { method, headers, credentials: "include" };
+  if (body !== undefined) {
+    config.body = JSON.stringify(body);
   }
-
-  #checkResponse(res) {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  }
-
-  getInitialCards() {
-    return fetch(`${this.#url}/cards`, {
-      headers: {
-        authorization: this.#token,
-      },
-    }).then((res) => this.#checkResponse(res));
-  }
-
-  getProfileInfo() {
-    return fetch(`${this.#url}/users/me`, {
-      headers: {
-        authorization: this.#token,
-      },
-    }).then((res) => this.#checkResponse(res));
-  }
-
-  setProfileInfo(userData) {
-    return fetch(`${this.#url}/users/me`, {
-      method: "PATCH",
-      headers: this.#headers,
-      body: JSON.stringify({
-        name: userData.name,
-        about: userData.about,
-      }),
-    }).then((res) => this.#checkResponse(res));
-  }
-
-  setAvatar(userData) {
-    return fetch(`${this.#url}/users/me/avatar`, {
-      method: "PATCH",
-      headers: this.#headers,
-      body: JSON.stringify({
-        avatar: userData.avatar,
-      }),
-    }).then((res) => this.#checkResponse(res));
-  }
-
-  addCard(cardData) {
-    return fetch(`${this.#url}/cards`, {
-      method: "POST",
-      headers: this.#headers,
-      body: JSON.stringify({
-        name: cardData.name,
-        link: cardData.link,
-      }),
-    }).then((res) => this.#checkResponse(res));
-  }
-
-  deleteCard(cardId) {
-    return fetch(`${this.#url}/cards/${cardId}`, {
-      method: "DELETE",
-      headers: {
-        authorization: this.#token,
-      },
-    }).then((res) => this.#checkResponse(res));
-  }
-
-  changeLikeCardStatus(cardId, likeStatus) {
-    const methodName = likeStatus ? "PUT" : "DELETE";
-    return fetch(`${this.#url}/cards/${cardId}/likes`, {
-      method: methodName,
-      headers: {
-        authorization: this.#token,
-      },
-    }).then((res) => this.#checkResponse(res));
-  }
+  return fetch(`${baseUrl}${url}`, config).then((res) => {
+    return res.ok
+      ? res.json()
+      : Promise.reject(`Ошибка: ${res.status} ${res.statusText}`);
+  });
 }
 
-const api = new Api({
-  baseUrl: "http://localhost:3000/",
-  headers: {
-    // authorization: "31b1a0e8-a4ec-4528-867c-b08055bd3ffe",
-    "Content-Type": "application/json",
-  },
-  credentials: 'include',
-});
+export function signUpUser({ password, email }) {
+  return request("/signup", "POST", { password, email });
+}
 
-export default api;
+export function signInUser({ password, email }) {
+  return request("/signin", "POST", { password, email });
+}
+
+export function signOutUser() {
+  return request("/users/me", "DELETE");
+}
+
+export function getContent() {
+  return request("/users/me", "GET");
+}
+
+export function getProfileInfo() {
+  return request("/users/me", "GET");
+}
+
+export function setProfileInfo({ name, about }) {
+  return request("/users/me", "PATCH", { name, about });
+}
+
+export function setAvatar({ avatar }) {
+  return request("/users/me/avatar", "PATCH", { avatar });
+}
+
+export function getInitialCards() {
+  return request("/cards", "GET");
+}
+
+export function addCard({ name, link }) {
+  return request("/cards", "POST", { name, link });
+}
+
+export function deleteCard(id) {
+  return request(`/cards/${id}`, "DELETE");
+}
+
+export function changeLikeCardStatus(id, likeStatus) {
+  const methodName = likeStatus ? "PUT" : "DELETE";
+  return request(`/cards/${id}/likes`, methodName);
+}

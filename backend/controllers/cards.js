@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const httpStatus = require('http-status-codes').StatusCodes;
 const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
@@ -13,19 +14,20 @@ const createCard = (req, res, next) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .catch(() => {
-      throw new BadRequestError({
-        message: 'Переданы некорректные данные при создании карточки',
-      });
-    })
     .then((card) => res.status(httpStatus.CREATED).send(card))
-    .catch(next);
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        next(new BadRequestError({
+          message: 'Переданы некорректные данные при создании карточки',
+        }));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
-
-  Card.findById(cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         return next(new NotFoundError({ message: 'Карточка с указанным id не найдена' }));
@@ -47,9 +49,8 @@ const deleteCard = (req, res, next) => {
 };
 
 const likeCard = (req, res, next) => {
-  const { cardId } = req.params;
   Card.findByIdAndUpdate(
-    cardId,
+    req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
@@ -57,7 +58,7 @@ const likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError({ message: 'Передан несуществующий id' });
       }
-      return res.status(httpStatus.OK).send({ data: card });
+      return res.status(httpStatus.OK).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -72,9 +73,8 @@ const likeCard = (req, res, next) => {
 };
 
 const dislikeCard = (req, res, next) => {
-  const { cardId } = req.params;
   Card.findByIdAndUpdate(
-    cardId,
+    req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
@@ -82,7 +82,7 @@ const dislikeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError({ message: 'Передан несуществующий id' });
       }
-      return res.status(httpStatus.OK).send({ data: card });
+      return res.status(httpStatus.OK).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {

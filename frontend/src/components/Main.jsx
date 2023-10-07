@@ -38,7 +38,7 @@ function Main(props) {
       </section>
       <section className="elements">
         <ul className="elements__container">
-          {props.cards?.map((data) => (
+          {props.cards.map((data) => (
               <Card
               key={data._id}
               card={data}

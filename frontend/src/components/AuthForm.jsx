@@ -31,7 +31,7 @@ function AuthForm(props) {
         {props.buttonText}
       </button>
 
-      {props.isSignedUp && <Link to="/sign-in" className="auth__link">
+      {props.isSignedUp && <Link to="/signin" className="auth__link">
         Уже зарегистрированы? Войти
       </Link>}
     </form>
