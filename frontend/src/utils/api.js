@@ -85,7 +85,7 @@ class Api {
 }
 
 const api = new Api({
-  baseUrl: "https://api.antonmikhailov.nomoredomainsrocks.ru",
+  baseUrl: "http://localhost:3000/",
   headers: {
     // authorization: "31b1a0e8-a4ec-4528-867c-b08055bd3ffe",
     "Content-Type": "application/json",

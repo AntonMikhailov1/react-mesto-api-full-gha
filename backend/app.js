@@ -12,13 +12,12 @@ const UsersRouter = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const NotFoundError = require('./errors/NotFoundError');
 
+const { MONGO_URL, PORT } = require('./config');
+
 const auth = require('./middlewares/auth');
 const { validateUser, validateLogin } = require('./middlewares/validation');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
-
-const { PORT = 3000 } = process.env;
-const { DB_ADDRESS = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const app = express();
 
@@ -48,7 +47,7 @@ const limiter = rateLimit({
 app.use(express.json());
 app.use(limiter);
 
-mongoose.connect(DB_ADDRESS);
+mongoose.connect(MONGO_URL);
 
 app.get('/', (req, res) => {
   res.status(httpStatus.OK).send({ message: 'Hello World!' });

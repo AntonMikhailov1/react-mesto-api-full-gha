@@ -1,4 +1,4 @@
-export const baseUrl = "https://api.antonmikhailov.nomoredomainsrocks.ru";
+export const baseUrl = "http://localhost:3000/";
 
 function checkError(res) {
     if (res.ok) {
