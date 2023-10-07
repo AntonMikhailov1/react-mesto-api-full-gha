@@ -73,9 +73,6 @@ export default function App() {
       .signInUser(signInData)
       .then((res) => {
         if (res) {
-          localStorage.setItem("jwt", res.token);
-          console.log(signInData);
-          console.log(signInData.email);
           setUserEmail(signInData.email);
           setLoggedIn(true);
           navigate("/");
@@ -89,17 +86,17 @@ export default function App() {
   }
 
   function handleUserSingOut() {
-    localStorage.removeItem("jwt");
+    localStorage.removeItem("token");
     setUserEmail("");
     setLoggedIn(false);
     navigate("/sign-in");
   }
 
   useEffect(() => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
+    const token = localStorage.getItem("token");
+    if (token) {
       auth
-        .checkToken(jwt)
+        .checkToken(token)
         .then((res) => {
           console.log(res);
           if (res) {

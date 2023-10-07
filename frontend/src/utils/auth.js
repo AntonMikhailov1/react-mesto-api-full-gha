@@ -1,4 +1,4 @@
-export const baseUrl = " https://auth.nomoreparties.co";
+export const baseUrl = "https://api.antonmikhailov.nomoredomainsrocks.ru";
 
 function checkError(res) {
     if (res.ok) {
@@ -13,6 +13,7 @@ export function signUpUser(data) {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(data),
     }).then(checkError);
 }
@@ -23,16 +24,16 @@ export function signInUser(data) {
         headers: {
             "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(data),
     }).then(checkError);
 }
 
-export function checkToken(token) {
+export function checkToken() {
     return fetch(`${baseUrl}/users/me`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
         },
     }).then(checkError);
 }

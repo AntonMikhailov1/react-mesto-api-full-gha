@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
+const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { errors } = require('celebrate');
 const httpStatus = require('http-status-codes').StatusCodes;
@@ -20,6 +21,19 @@ const { PORT = 3000 } = process.env;
 const { DB_ADDRESS = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const app = express();
+
+app.use(cors({
+  credentials: true,
+  origin: [
+    'https://praktikum.tk',
+    'http://praktikum.tk',
+    'http://antonmikhailov.nomoredomainsrocks.ru',
+    'https://api.antonmikhailov.nomoredomainsrocks.ru',
+    'http://localhost:3000',
+    'http://localhost:3001',
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+}));
 
 app.use(requestLogger);
 app.use(helmet());
@@ -44,6 +58,12 @@ app.post('/signin', validateLogin, login);
 app.post('/signup', validateUser, createUser);
 
 app.use(auth);
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.use('/', CardsRouter);
 app.use('/', UsersRouter);
