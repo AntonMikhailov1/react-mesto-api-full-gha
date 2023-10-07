@@ -7,7 +7,7 @@
 
 ## Ссылки на проект
 
-IP-адрес 51.250.77.191
+IP-адрес <51.250.77.191>
 
 Frontend https://antonmikhailov.nomoredomainsrocks.ru
 
