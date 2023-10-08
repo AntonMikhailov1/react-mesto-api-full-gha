@@ -18,8 +18,8 @@ const {
 router.get('/', getUser);
 router.get('/me', getCurrentUser);
 router.get('/:userId', validateUserId, getUserById);
-router.delete('/me', logout);
 router.patch('/me', validateUserUpdate, updateUser);
 router.patch('/me/avatar', validateAvatar, updateAvatar);
+router.delete('/me', logout);
 
 module.exports = router;

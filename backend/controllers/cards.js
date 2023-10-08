@@ -17,9 +17,7 @@ const createCard = (req, res, next) => {
     .then((card) => res.status(httpStatus.CREATED).send(card))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError({
-          message: 'Переданы некорректные данные при создании карточки',
-        }));
+        next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       } else {
         next(err);
       }
@@ -30,10 +28,10 @@ const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        return next(new NotFoundError({ message: 'Карточка с указанным id не найдена' }));
+        return next(new NotFoundError('Карточка с указанным id не найдена'));
       }
       if (!card.owner.equals(req.user._id)) {
-        return next(new ForbiddenError({ message: 'Нет доступа' }));
+        return next(new ForbiddenError('Нет доступа'));
       }
       return card
         .deleteOne()
@@ -41,7 +39,7 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные' }));
+        next(new BadRequestError('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -56,16 +54,14 @@ const likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError({ message: 'Передан несуществующий id' });
+        throw new NotFoundError('Передан несуществующий id');
       }
       return res.status(httpStatus.OK).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(
-          new BadRequestError({
-            message: 'Переданы некорректные данные для постановки/снятия лайка',
-          }),
+          new BadRequestError('Переданы некорректные данные для постановки/снятия лайка'),
         );
       }
       return next(err);
@@ -80,16 +76,14 @@ const dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError({ message: 'Передан несуществующий id' });
+        throw new NotFoundError('Передан несуществующий id');
       }
       return res.status(httpStatus.OK).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(
-          new BadRequestError({
-            message: 'Переданы некорректные данные для постановки/снятия лайка',
-          }),
+          new BadRequestError('Переданы некорректные данные для постановки/снятия лайка'),
         );
       }
       return next(err);

@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const cors = require('cors');
+const cors = require('./middlewares/cors');
 
 const router = require('./routes/index');
 
@@ -17,15 +17,6 @@ const errorHandler = require('./middlewares/errorHandler');
 
 const { MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 const { PORT = 3000 } = process.env;
-
-const allowCorsList = [
-  'https://antonmikhailov.nomoredomainsrocks.ru',
-  'http://antonmikhailov.nomoredomainsrocks.ru',
-  'https://localhost:3000',
-  'http://localhost:3000',
-  'https://localhost:3001',
-  'http://localhost:3001',
-];
 
 const app = express();
 
@@ -36,8 +27,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 1000,
+  max: 5000000,
   message: 'Слишком много запросов',
 });
 
@@ -45,28 +36,13 @@ app.use(helmet());
 app.use(requestLogger);
 app.use(limiter);
 
-app.options(
-  '*',
-  cors({
-    origin: allowCorsList,
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-type', 'Authorization', 'Accept'],
-    credentials: true,
-    exposedHeaders: ['set-cookie'],
-    optionsSuccessStatus: 204,
-  }),
-);
+app.use(cors);
 
-app.use(
-  cors({
-    origin: allowCorsList,
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-type', 'Authorization', 'Accept'],
-    credentials: true,
-    exposedHeaders: ['set-cookie'],
-    optionsSuccessStatus: 204,
-  }),
-);
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.use('/', router);
 

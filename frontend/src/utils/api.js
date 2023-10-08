@@ -1,4 +1,4 @@
-const baseUrl = "https://localhost:3000";
+const baseUrl = "http://localhost:3000";
 
 export function request(url, method, body) {
   const headers = { "Content-Type": "application/json" };
@@ -9,7 +9,7 @@ export function request(url, method, body) {
   return fetch(`${baseUrl}${url}`, config).then((res) => {
     return res.ok
       ? res.json()
-      : Promise.reject(`Ошибка: ${res.status} ${res.statusText}`);
+      : Promise.reject(`Ошибка: ${res.status}`);
   });
 }
 
@@ -23,10 +23,6 @@ export function signInUser({ password, email }) {
 
 export function signOutUser() {
   return request("/users/me", "DELETE");
-}
-
-export function getContent() {
-  return request("/users/me", "GET");
 }
 
 export function getProfileInfo() {

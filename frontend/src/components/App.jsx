@@ -8,9 +8,7 @@ import "../index.css";
 
 import * as api from "../utils/api";
 
-import Header from "./Header";
 import Main from "./Main";
-import Footer from "./Footer";
 import AddPlacePopup from "./AddPlacePopup";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
@@ -19,6 +17,7 @@ import ImagePopup from "./ImagePopup";
 import Login from "./Login";
 import Register from "./Register";
 import InfoTooltip from "./InfoTooltip";
+import AppLayout from "./AppLayout";
 
 export default function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -39,79 +38,29 @@ export default function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (loggedIn) {
+    loggedIn &&
       Promise.all([api.getProfileInfo(), api.getInitialCards()])
-        .then(([userData, cardData]) => {
+        .then(([userData, cardsData]) => {
           setCurrentUser(userData);
-          setCards(cardData.reverse());
+          setCards(cardsData.reverse());
         })
-        .catch((err) => console.error(err));
-    }
+        .catch((err) => {
+          console.log(err);
+        });
   }, [loggedIn]);
 
-  const handleUserSignUp = useCallback(
-    async (userData) => {
-      try {
-        const data = await api.signUpUser(userData);
-        if (data) {
-          setIsSignUpSuccess(true);
-          navigate("/signin", { replace: true });
-        }
-      } catch (err) {
-          setIsSignUpSuccess(false);
-          console.log(err);
-      } finally {
-        setIsInfoTooltipOpen(true);
-      }
-    },
-    [navigate]
-  );
-
-  const handleUserSignIn = useCallback(
-    async (userData) => {
-      try {
-        const data = await api.signInUser(userData);
-        if (data) {
-          setLoggedIn(true);
-          setUserEmail(userData.email);
-          navigate("/", { replace: true });
-        }
-      } catch (err) {
-        setIsSignUpSuccess(false);
-        setIsInfoTooltipOpen(true);
-        console.log(err);
-      }
-    },
-    [navigate]
-  );
-
-  const handleUserSingOut = useCallback(async () => {
+  const handleCardDelete = useCallback(async (card) => {
     try {
-      const data = await api.signOutUser();
+      const data = await api.deleteCard(card._id);
       if (data) {
-        setLoggedIn(false);
-        setUserEmail("");
-        navigate("/signin", { replace: true });
+        setCards((state) => state.filter((item) => item._id !== card._id));
       }
     } catch (err) {
-      console.error(err);
+      console.log(err);
     }
-  }, [navigate]);
+  }, []);
 
-  const handleCardDelete = useCallback(
-    async (card) => {
-      try {
-        const data = await api.deleteCard(card._id);
-        if (data) {
-          setCards((state) => state.filter((item) => item._id !== card._id));
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }, []
-  );
-
-const handleCardLike = useCallback(
+  const handleCardLike = useCallback(
     async (card) => {
       const isLiked = card.likes.some((item) => item === currentUser._id);
       try {
@@ -134,6 +83,7 @@ const handleCardLike = useCallback(
     setIsAddPlacePopupOpen(false);
     setIsImagePopupOpen(false);
     setIsInfoTooltipOpen(false);
+    setSelectedCard({});
   }, []);
 
   const handleUpdateUser = useCallback(
@@ -185,11 +135,11 @@ const handleCardLike = useCallback(
     setIsEditProfilePopupOpen(true);
   }, []);
 
-  const handleEditAvatarClick= useCallback(() => {
+  const handleEditAvatarClick = useCallback(() => {
     seIsEditAvatarPopupOpen(true);
   }, []);
 
-  const handleAddPlaceClick= useCallback(() => {
+  const handleAddPlaceClick = useCallback(() => {
     setIsAddPlacePopupOpen(true);
   }, []);
 
@@ -198,13 +148,49 @@ const handleCardLike = useCallback(
     setIsImagePopupOpen(true);
   }, []);
 
-  const userLoginCheck = useCallback(async () => {
+  const handleUserSignUp = useCallback(
+    async (userData) => {
+      try {
+        const data = await api.signUpUser(userData);
+        if (data) {
+          setIsSignUpSuccess(true);
+          navigate("/sign-in", { replace: true });
+        }
+      } catch (err) {
+        setIsSignUpSuccess(false);
+        console.log(err);
+      } finally {
+        setIsInfoTooltipOpen(true);
+      }
+    },
+    [navigate]
+  );
+
+  const handleUserSignIn = useCallback(
+    async (userData) => {
+      try {
+        const data = await api.signInUser(userData);
+        if (data) {
+          setLoggedIn(true);
+          setUserEmail(userData.email);
+          navigate("/", { replace: true });
+        }
+      } catch (err) {
+        setIsSignUpSuccess(false);
+        setIsInfoTooltipOpen(true);
+        console.log(err);
+      }
+    },
+    [navigate]
+  );
+
+  const handleUserSingOut = useCallback(async () => {
     try {
-      const userData = await api.getContent();
-      if (userData.email) {
-        setUserEmail(userData.email);
-        setLoggedIn(true);
-        navigate("/", { replace: true });
+      const data = await api.signOutUser();
+      if (data) {
+        setLoggedIn(false);
+        setUserEmail("");
+        navigate("/sign-in", { replace: true });
       }
     } catch (err) {
       console.error(err);
@@ -212,21 +198,40 @@ const handleCardLike = useCallback(
   }, [navigate]);
 
   useEffect(() => {
-    userLoginCheck();
-  }, [userLoginCheck]);
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    const userLoginCheck = async () => {
+        await sleep(1000);
+
+        const userData = await api.getProfileInfo();
+        if (!userData) {
+          throw new Error("Данные пользователя отсутствует");
+        }
+        setUserEmail(userData.email);
+        setLoggedIn(true);
+        navigate("/", { replace: true });
+      };
+
+      userLoginCheck().catch(err => {console.error(err)});
+  }, [navigate]);
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
-      <div className="page__container">
-        <Header onSignOut={handleUserSingOut} userEmail={userEmail} />
-
+    <div className="page__container">
+      <CurrentUserContext.Provider value={currentUser}>
         <Routes>
-          <Route element={<ProtectedRoute loggedIn={loggedIn} />}>
+          <Route
+            path="/"
+            element={
+              <AppLayout userEmail={userEmail} onSignOut={handleUserSingOut} />
+            }
+          >
             <Route
-              exact
-              path="/"
+              index
               element={
-                <Main
+                <ProtectedRoute
+                  element={Main}
+                  loggedIn={loggedIn}
                   onEditProfile={handleEditProfileClick}
                   onAddPlace={handleAddPlaceClick}
                   onEditAvatar={handleEditAvatarClick}
@@ -237,24 +242,20 @@ const handleCardLike = useCallback(
                 />
               }
             />
+
+            <Route
+              path="/sign-up"
+              element={<Register onSignUp={handleUserSignUp} />}
+            />
+
+            <Route
+              path="/sign-in"
+              element={<Login onSignIn={handleUserSignIn} />}
+            />
+
+            <Route path="*" element={<Navigate to="/sign-in" />} />
           </Route>
-
-          <Route
-            exact
-            path="/signup"
-            element={<Register onSignUp={handleUserSignUp} />}
-          />
-
-          <Route
-            exact
-            path="/signin"
-            element={<Login onSignIn={handleUserSignIn} />}
-          />
-
-          <Route path="*" element={<Navigate to="/signin" />} />
         </Routes>
-
-        <Footer />
 
         <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
@@ -285,7 +286,7 @@ const handleCardLike = useCallback(
           onClose={closeAllPopups}
           isSuccess={isSignUpSuccess}
         />
-      </div>
-    </CurrentUserContext.Provider>
+      </CurrentUserContext.Provider>
+    </div>
   );
 }
