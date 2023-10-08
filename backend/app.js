@@ -16,7 +16,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 
 const { MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
-const { PORT = 3000 } = process.env;
+const { PORT = 3001 } = process.env;
 
 const allowCorsList = [
   'https://antonmikhailov.nomoredomainsrocks.ru',
@@ -42,6 +42,7 @@ const limiter = rateLimit({
 });
 
 app.use(helmet());
+app.use(requestLogger);
 app.use(limiter);
 
 app.options(
@@ -66,8 +67,6 @@ app.use(
     optionsSuccessStatus: 204,
   }),
 );
-
-app.use(requestLogger);
 
 app.use('/', router);
 
