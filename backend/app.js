@@ -16,7 +16,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 
 const { MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 
 const allowCorsList = [
   'https://antonmikhailov.nomoredomainsrocks.ru',
@@ -72,12 +72,6 @@ app.use('/', router);
 
 app.get('/', (req, res) => {
   res.status(httpStatus.OK).send({ message: 'Hello World!' });
-});
-
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Server failure');
-  }, 0);
 });
 
 app.use(errorLogger);

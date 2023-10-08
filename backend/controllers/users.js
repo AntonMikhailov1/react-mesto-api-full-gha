@@ -115,13 +115,13 @@ const login = (req, res, next) => {
 };
 
 const logout = (req, res) => {
-  res.clearCookie('jwt').send({ message: 'Вы вышли из системы' });
-  // res.cookie('jwt', 'none', {
-  //   maxAge: 10,
-  //   httpOnly: true,
-  //   sameSite: true,
-  // });
-  // res.send({ message: 'Вы вышли из системы' });
+  // res.clearCookie('jwt').send({ message: 'Вы вышли из системы' });
+  res.cookie('jwt', 'none', {
+    maxAge: 10,
+    httpOnly: true,
+    sameSite: true,
+  });
+  res.send({ message: 'Вы вышли из системы' });
 };
 
 const updateUser = (req, res, next) => {

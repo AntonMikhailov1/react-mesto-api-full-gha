@@ -1,8 +1,9 @@
+const httpStatus = require('http-status-codes').StatusCodes;
+
 class NotFoundError extends Error {
-  constructor(message, ...rest) {
-    super(...rest);
-    this.status = 404;
-    this.message = message;
+  constructor(message) {
+    super(message);
+    this.status = httpStatus.NOT_FOUND;
   }
 }
 

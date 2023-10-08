@@ -1,4 +1,4 @@
-const baseUrl = "https://api.antonmikhailov.nomoredomainsrocks.ru";
+const baseUrl = "https://localhost:3000";
 
 export function request(url, method, body) {
   const headers = { "Content-Type": "application/json" };
