@@ -28,7 +28,7 @@ const getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные'));
+        next(new BadRequestError({ message: 'Переданы некорректные данные' }));
       } else next(err);
     });
 };
@@ -46,7 +46,7 @@ const getCurrentUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(BadRequestError('Переданы некорректные данные'));
+        next(BadRequestError({ message: 'Переданы некорректные данные' }));
       } else next(err);
     });
 };
@@ -74,12 +74,17 @@ const createUser = (req, res, next) => {
         .catch((err) => {
           if (err.code === 11000) {
             return next(
-              new ConflictError('Пользователь с таким email уже существует'),
+              new ConflictError({
+                message: 'Пользователь с таким email уже существует',
+              }),
             );
           }
           if (err instanceof mongoose.Error.ValidationError) {
             return next(
-              new BadRequestError('Переданы некоректные данные при создании пользователя'),
+              new BadRequestError({
+                message:
+                  'Переданы некоректные данные при создании пользователя',
+              }),
             );
           }
           next(err);
@@ -111,12 +116,6 @@ const login = (req, res, next) => {
 
 const logout = (req, res) => {
   res.clearCookie('jwt').send({ message: 'Вы вышли из системы' });
-  // res.cookie('jwt', 'none', {
-  //   maxAge: 8880,
-  //   httpOnly: true,
-  //   sameSite: true,
-  // });
-  // res.send({ message: 'Вы вышли из системы' });
 };
 
 const updateUser = (req, res, next) => {
@@ -129,14 +128,16 @@ const updateUser = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь не найден');
+        throw new NotFoundError({ message: 'Пользователь не найден' });
       }
       res.status(httpStatus.OK).send(user);
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return next(
-          new BadRequestError('Переданы некорректные данные при обновлении пофиля'),
+          new BadRequestError({
+            message: 'Переданы некорректные данные при обновлении пофиля',
+          }),
         );
       }
       next(err);
@@ -155,7 +156,9 @@ const updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return next(
-          new BadRequestError('Переданы некорректные данные при обновлении пофиля'),
+          new BadRequestError({
+            message: 'Переданы некорректные данные при обновлении пофиля',
+          }),
         );
       }
       next(err);
