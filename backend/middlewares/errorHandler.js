@@ -7,7 +7,7 @@ const errorHandler = (err, req, res, next) => {
   }
   res
     .status(httpStatus.INTERNAL_SERVER_ERROR)
-    .send(`Ошибка по умолчанию: ${err.message}`);
+    .send({ message: `Ошибка по умолчанию: ${err.message}` });
 
   next();
 };
