@@ -27,7 +27,7 @@ const getUserById = (req, res, next) => {
       return res.status(httpStatus.OK).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError({ message: 'Переданы некорректные данные' }));
       } else next(err);
     });
@@ -45,7 +45,7 @@ const getCurrentUser = (req, res, next) => {
       res.status(httpStatus.OK).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         next(BadRequestError({ message: 'Переданы некорректные данные' }));
       } else next(err);
     });

@@ -40,7 +40,7 @@ const deleteCard = (req, res, next) => {
         .then(() => res.status(httpStatus.OK).send({ message: 'Карточка успешно удалена' }));
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         next(new BadRequestError({ message: 'Переданы некорректные данные' }));
       } else {
         next(err);
@@ -61,7 +61,7 @@ const likeCard = (req, res, next) => {
       return res.status(httpStatus.OK).send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err instanceof mongoose.Error.CastError) {
         return next(
           new BadRequestError({
             message: 'Переданы некорректные данные для постановки/снятия лайка',
