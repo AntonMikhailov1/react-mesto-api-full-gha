@@ -28,7 +28,7 @@ app.use(cookieParser());
 
 const limiter = rateLimit({
   windowMs: 1000,
-  max: 5000000,
+  max: 5000,
   message: 'Слишком много запросов',
 });
 
