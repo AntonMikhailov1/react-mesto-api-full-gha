@@ -2,7 +2,7 @@ const httpStatus = require('http-status-codes').StatusCodes;
 
 const errorHandler = (err, req, res, next) => {
   if (err.status) {
-    res.status(err.status).send(err.message);
+    res.status(err.status).send(err);
     return;
   }
   res
