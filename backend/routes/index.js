@@ -12,7 +12,7 @@ const { validateUser, validateLogin } = require('../middlewares/validation');
 
 router.get('/crash-test', () => {
   setTimeout(() => {
-    throw new Error({ message: 'Сервер сейчас упадёт' });
+    throw new Error('Сервер сейчас упадёт');
   }, 0);
 });
 
