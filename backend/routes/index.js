@@ -22,7 +22,7 @@ router.post('/signup', validateUser, createUser);
 router.use('/users', auth, usersRouter);
 router.use('/cards', auth, cardsRouter);
 
-router.use('/*', auth, () => {
+router.use('*', auth, () => {
   throw new NotFoundError({ message: 'Страница не найдена' });
 });
 

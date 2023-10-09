@@ -38,11 +38,11 @@ app.use(limiter);
 
 app.use(cors);
 
-app.use('/', router);
-
 app.get('/', (req, res) => {
   res.status(httpStatus.OK).send({ message: 'Hello World!' });
 });
+
+app.use('/', router);
 
 app.use(errorLogger);
 app.use(errors());
