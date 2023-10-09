@@ -2,12 +2,12 @@ const httpStatus = require('http-status-codes').StatusCodes;
 
 const errorHandler = (err, req, res, next) => {
   if (err.status) {
-    res.status(err.status).send(err);
+    res.status(err.status).send({ message: err.message });
     return;
   }
   res
     .status(httpStatus.INTERNAL_SERVER_ERROR)
-    .send(`Ошибка по умолчанию: ${err.message}`);
+    .send({ message: `Ошибка по умолчанию: ${err.message}` });
 
   next();
 };
